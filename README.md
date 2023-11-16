@@ -1,3 +1,3 @@
-# Clouds Locust
+# Clouds IoT devices
 
-Project to generate requests to GCP service using locust, to check auto-scale.
+Emulating three IoT devices: temperature, humidity and heartbeat measurers.
