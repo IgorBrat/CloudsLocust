@@ -104,6 +104,7 @@ def send_messages():
             time.sleep(args.delay_ms * 1e-3)
         except Exception as e:
             print(e)
+    return flask.Response(status=HTTPStatus.OK)
 
 
 creds, _ = google.auth.load_credentials_from_file(r'./resources/creds.json',
