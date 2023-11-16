@@ -100,7 +100,7 @@ def send_messages():
             base64_bytes = base64.b64encode(message_bytes)
             message_encoded = base64_bytes.decode('ascii')
             resp = session.post(target_url, data=prepare_message(message_encoded))
-            print(resp)
+            print(resp.content)
             time.sleep(args.delay_ms * 1e-3)
         except Exception as e:
             print(f'Exception: {e}')
