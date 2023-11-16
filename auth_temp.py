@@ -96,10 +96,11 @@ def send_messages():
             }
 
             data = json.dumps(data)
-            message_bytes = data.encode('ascii')
-            base64_bytes = base64.b64encode(message_bytes)
-            message_encoded = base64_bytes.decode('ascii')
-            resp = session.post(target_url, data=prepare_message(data))
+            # message_bytes = data.encode('ascii')
+            # base64_bytes = base64.b64encode(message_bytes)
+            # message_encoded = base64_bytes.decode('ascii')
+            encoded_str = base64.b64encode(bytes(data, encoding='utf-8'))
+            resp = session.post(target_url, data=prepare_message(encoded_str.decode()))
             print(resp)
             time.sleep(args.delay_ms * 1e-3)
         except Exception as e:
