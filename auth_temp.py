@@ -55,6 +55,7 @@ curr_temp = 25
 # Web Server
 app = flask.Flask(__name__)
 
+
 def prepare_message(data):
     return {
         "messages": [
@@ -63,6 +64,7 @@ def prepare_message(data):
             }
         ]
     }
+
 
 @app.get("/check")
 def check():
@@ -84,21 +86,24 @@ def check():
 def send_messages():
     curr_heartbeat = 110
     for _ in range(args.num):
-        data = {
-            "type": "HB",
-            "value": curr_heartbeat,
-            "datetime": str(datetime.datetime.now()),
-            "latitude": latitude + (random.random() - 0.5) * 1e-2,
-            "longitude": longitude + (random.random() - 0.5) * 1e-2,
-        }
+        try:
+            data = {
+                "type": "HB",
+                "value": curr_heartbeat,
+                "datetime": str(datetime.datetime.now()),
+                "latitude": latitude + (random.random() - 0.5) * 1e-2,
+                "longitude": longitude + (random.random() - 0.5) * 1e-2,
+            }
 
-        data = json.dumps(data)
-        message_bytes = data.encode('ascii')
-        base64_bytes = base64.b64encode(message_bytes)
-        message_encoded = base64_bytes.decode('ascii')
-        resp = session.post(target_url, data=prepare_message(data))
-        print(resp)
-        time.sleep(args.delay_ms * 1e-3)
+            data = json.dumps(data)
+            message_bytes = data.encode('ascii')
+            base64_bytes = base64.b64encode(message_bytes)
+            message_encoded = base64_bytes.decode('ascii')
+            resp = session.post(target_url, data=prepare_message(data))
+            print(resp)
+            time.sleep(args.delay_ms * 1e-3)
+        except Exception as e:
+            print(e)
 
 
 creds, _ = google.auth.load_credentials_from_file(r'./resources/creds.json',
