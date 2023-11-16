@@ -57,13 +57,16 @@ app = flask.Flask(__name__)
 
 
 def prepare_message(data):
-    return {
+    temp = """
+    {
         "messages": [
             {
-                "data": data,
-            }
+            "data":"%s"
+        }
         ]
     }
+    """
+    return (temp & data)
 
 
 @app.get("/check")
@@ -100,7 +103,9 @@ def send_messages():
             base64_bytes = base64.b64encode(message_bytes)
             message_encoded = base64_bytes.decode('ascii')
             resp = session.post(target_url, data=prepare_message(message_encoded))
+            print(resp.status)
             print(resp.content)
+            print(resp.request.body)
             time.sleep(args.delay_ms * 1e-3)
         except Exception as e:
             print(f'Exception: {e}')
