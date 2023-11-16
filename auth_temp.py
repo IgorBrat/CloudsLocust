@@ -55,6 +55,14 @@ curr_temp = 25
 # Web Server
 app = flask.Flask(__name__)
 
+def prepare_message(data):
+    return {
+        "messages": [
+            {
+                "data": data,
+            }
+        ]
+    }
 
 @app.get("/check")
 def check():
@@ -88,7 +96,7 @@ def send_messages():
         message_bytes = data.encode('ascii')
         base64_bytes = base64.b64encode(message_bytes)
         message_encoded = base64_bytes.decode('ascii')
-        resp = session.post(target_url, data=message_encoded)
+        resp = session.post(target_url, data=prepare_message(data))
         print(resp)
         time.sleep(args.delay_ms * 1e-3)
 
