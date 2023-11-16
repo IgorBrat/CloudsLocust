@@ -96,19 +96,19 @@ def send_messages():
             }
 
             data = json.dumps(data)
-            # message_bytes = data.encode('ascii')
-            # base64_bytes = base64.b64encode(message_bytes)
-            # message_encoded = base64_bytes.decode('ascii')
-            encoded_str = base64.b64encode(bytes(data, encoding='utf-8'))
-            resp = session.post(target_url, data=prepare_message(encoded_str.decode()))
+            message_bytes = data.encode('ascii')
+            base64_bytes = base64.b64encode(message_bytes)
+            message_encoded = base64_bytes.decode('ascii')
+            resp = session.post(target_url, data=prepare_message(message_encoded))
             print(resp)
             time.sleep(args.delay_ms * 1e-3)
         except Exception as e:
-            print(e)
+            print(f'Exception: {e}')
     return flask.Response(status=HTTPStatus.OK)
 
 
 creds, _ = google.auth.load_credentials_from_file(r'./resources/creds.json',
                                                   scopes=['https://www.googleapis.com/auth/pubsub'])
+print(creds)
 session = AuthorizedSession(creds)
 app.run(host='0.0.0.0')
