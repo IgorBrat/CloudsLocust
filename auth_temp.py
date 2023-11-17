@@ -46,11 +46,19 @@ target_url = f"https://pubsub.googleapis.com/v1/projects/{args.project_id}/topic
 # Location
 loc = Nominatim(user_agent="GetLoc")
 
-getLoc = loc.geocode("New York USA")
-latitude = getLoc.latitude
-longitude = getLoc.longitude
+getLoc1 = loc.geocode("New York USA")
+latitude1 = getLoc1.latitude
+longitude1 = getLoc1.longitude
+getLoc2 = loc.geocode("Brussel Belgium")
+latitude2 = getLoc2.latitude
+longitude2 = getLoc2.longitude
+getLoc3 = loc.geocode("Paris France")
+latitude3 = getLoc3.latitude
+longitude3 = getLoc3.longitude
 
 curr_temp = 25
+curr_humidity = 60
+curr_heartbeat = 110
 
 # Web Server
 app = flask.Flask(__name__)
@@ -66,6 +74,17 @@ def prepare_message(data):
     }
 
 
+def publish_message(data):
+    data = json.dumps(data)
+    message_bytes = data.encode('ascii')
+    base64_bytes = base64.b64encode(message_bytes)
+    message_encoded = base64_bytes.decode('ascii')
+    resp = session.post(target_url, data=(prepare_message(message_encoded)))
+    print(resp)
+    print(resp.content)
+    print(resp.request.body)
+
+
 @app.get("/check")
 def check():
     check_body = {
@@ -74,38 +93,33 @@ def check():
             "type": "TEMP",
             "value": curr_temp,
             "datetime": str(datetime.datetime.now()),
-            "latitude": latitude + (random.random() - 0.5) * 1e-2,
-            "longitude": longitude + (random.random() - 0.5) * 1e-2,
+            "latitude": latitude1 + (random.random() - 0.5) * 1e-2,
+            "longitude": longitude1 + (random.random() - 0.5) * 1e-2,
         }
     }
     check_body = json.dumps(check_body)
     return flask.Response(check_body, HTTPStatus.OK)
 
 
-@app.get("/post")
+@app.get("/send/temp")
 def send_messages():
-    curr_heartbeat = 110
+    global curr_temp
     for _ in range(args.num):
         try:
             data = {
-                "type": "HB",
-                "value": curr_heartbeat,
+                "type": "TEMP",
+                "value": curr_temp,
                 "datetime": str(datetime.datetime.now()),
-                "latitude": latitude + (random.random() - 0.5) * 1e-2,
-                "longitude": longitude + (random.random() - 0.5) * 1e-2,
+                "latitude": latitude1 + (random.random() - 0.5) * 1e-2,
+                "longitude": longitude1 + (random.random() - 0.5) * 1e-2,
             }
 
-            data = json.dumps(data)
-            message_bytes = data.encode('ascii')
-            base64_bytes = base64.b64encode(message_bytes)
-            message_encoded = base64_bytes.decode('ascii')
-            resp = session.post(target_url, data=(prepare_message(message_encoded)))
-            print(resp)
-            print(resp.content)
-            print(resp.request.body)
+            publish_message(data)
             time.sleep(args.delay_ms * 1e-3)
+            curr_temp = generate_temperature(curr_temp)
         except Exception as e:
             print(f'Exception: {e}')
+            return flask.Response(status=HTTPStatus.BAD_REQUEST)
     return flask.Response(status=HTTPStatus.OK)
 
 
