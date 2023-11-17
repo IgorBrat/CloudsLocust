@@ -113,7 +113,7 @@ def check():
 
 
 @app.get("/send/temperature")
-def send_messages():
+def send_temperature():
     num = int(flask.request.args.get('num'))
     delay_ms = int(flask.request.args.get('delay'))
     global curr_temp
@@ -140,7 +140,7 @@ def send_messages():
 
 
 @app.get("/send/humidity")
-def send_messages():
+def send_humidity():
     num = int(flask.request.args.get('num'))
     delay_ms = int(flask.request.args.get('delay'))
     global curr_humidity
@@ -167,7 +167,7 @@ def send_messages():
 
 
 @app.get("/send/heartbeat")
-def send_messages():
+def send_heartbeat():
     num = int(flask.request.args.get('num'))
     delay_ms = int(flask.request.args.get('delay'))
     global curr_heartbeat
