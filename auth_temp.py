@@ -24,14 +24,15 @@ def generate_temperature(last_temp, min_threshold=0, max_threshold=60):
 credentials_path = r"./resources/creds.json"
 
 parser = argparse.ArgumentParser(description='Humidity measure device')
+parser.add_argument('--project_id', type=str, help='Receiver gcp project id')
+parser.add_argument('--topic_id', type=str, help='Receiver gcp topic id')
 args = parser.parse_args()
+
 if not args.project_id:
     raise ValueError('Specify project id')
 if not args.topic_id:
     raise ValueError('Specify topic id')
-# Parse arguments
-parser.add_argument('--project_id', type=str, help='Receiver gcp project id')
-parser.add_argument('--topic_id', type=str, help='Receiver gcp topic id')
+
 
 target_url = f"https://pubsub.googleapis.com/v1/projects/{args.project_id}/topics/{args.topic_id}:publish"
 
