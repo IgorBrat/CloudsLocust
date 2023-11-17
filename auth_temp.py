@@ -20,26 +20,18 @@ def generate_temperature(last_temp, min_threshold=0, max_threshold=60):
     return round(temp, 3)
 
 
-parser = argparse.ArgumentParser(description='Temperature measure device')
+# Auth
+credentials_path = r"./resources/creds.json"
 
-# Parse arguments
-parser.add_argument('--num', type=int, help='Number of messages to send')
-parser.add_argument('--delay_ms', type=int, default=20, help='Sending data delay')
-parser.add_argument('--project_id', type=str, help='Receiver gcp project id')
-parser.add_argument('--topic_id', type=str, help='Receiver gcp topic id')
-
+parser = argparse.ArgumentParser(description='Humidity measure device')
 args = parser.parse_args()
-if not args.num:
-    raise ValueError('Number of messages can`t be None or zero')
-if args.delay_ms <= 0:
-    raise ValueError('Delay can`t be negative of zero')
 if not args.project_id:
     raise ValueError('Specify project id')
 if not args.topic_id:
     raise ValueError('Specify topic id')
-
-# Auth
-credentials_path = r"./resources/creds.json"
+# Parse arguments
+parser.add_argument('--project_id', type=str, help='Receiver gcp project id')
+parser.add_argument('--topic_id', type=str, help='Receiver gcp topic id')
 
 target_url = f"https://pubsub.googleapis.com/v1/projects/{args.project_id}/topics/{args.topic_id}:publish"
 
@@ -79,10 +71,11 @@ def publish_message(data):
     message_bytes = data.encode('ascii')
     base64_bytes = base64.b64encode(message_bytes)
     message_encoded = base64_bytes.decode('ascii')
-    resp = session.post(target_url, data=(prepare_message(message_encoded)))
+    resp = session.post(target_url, json=(prepare_message(message_encoded)))
     print(resp)
     print(resp.content)
     print(resp.request.body)
+    return resp
 
 
 @app.get("/check")
@@ -104,7 +97,8 @@ def check():
 @app.get("/send/temp")
 def send_messages():
     global curr_temp
-    for _ in range(args.num):
+    resps = []
+    for _ in range(2):
         try:
             data = {
                 "type": "TEMP",
@@ -114,13 +108,13 @@ def send_messages():
                 "longitude": longitude1 + (random.random() - 0.5) * 1e-2,
             }
 
-            publish_message(data)
-            time.sleep(args.delay_ms * 1e-3)
+            resps.append(publish_message(data))
+            time.sleep(20 * 1e-3)
             curr_temp = generate_temperature(curr_temp)
         except Exception as e:
             print(f'Exception: {e}')
             return flask.Response(status=HTTPStatus.BAD_REQUEST)
-    return flask.Response(status=HTTPStatus.OK)
+    return flask.Response(resps, status=HTTPStatus.OK)
 
 
 creds, _ = google.auth.load_credentials_from_file(r'./resources/creds.json',
