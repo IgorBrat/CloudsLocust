@@ -1,5 +1,6 @@
 import base64
 import datetime
+import os
 import random
 from http import HTTPStatus
 from geopy import Nominatim
@@ -52,6 +53,7 @@ if not args.topic_id:
     raise ValueError('Specify topic id')
 
 target_url = f"https://pubsub.googleapis.com/v1/projects/{args.project_id}/topics/{args.topic_id}:publish"
+function_endpoint = f"https://{os.getenv('ZONE')}-{args.project_id}.cloudfunctions.net/{os.getenv('FUNC_NAME')}"
 
 # Location
 loc = Nominatim(user_agent="GetLoc")
@@ -191,6 +193,11 @@ def send_heartbeat():
             return flask.Response(status=HTTPStatus.BAD_REQUEST)
     resp_to_return['request_body'] = resps
     return flask.Response(json.dumps(resp_to_return), status=HTTPStatus.OK)
+
+@app.get("/getData")
+def get_db_data():
+    _ = session.get(function_endpoint)
+    return flask.Response('great', status=HTTPStatus.OK)
 
 
 creds, _ = google.auth.load_credentials_from_file(r'./resources/creds.json',
