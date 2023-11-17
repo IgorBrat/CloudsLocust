@@ -98,6 +98,7 @@ def check():
 @app.get("/send/temp")
 def send_messages():
     global curr_temp
+    resp_to_return = {}
     resps = []
     for _ in range(2):
         try:
@@ -115,7 +116,8 @@ def send_messages():
         except Exception as e:
             print(f'Exception: {e}')
             return flask.Response(status=HTTPStatus.BAD_REQUEST)
-    return flask.Response(resps, status=HTTPStatus.OK)
+    resp_to_return['request_body'] = resps
+    return flask.Response(json.dumps(resp_to_return), status=HTTPStatus.OK)
 
 
 creds, _ = google.auth.load_credentials_from_file(r'./resources/creds.json',
