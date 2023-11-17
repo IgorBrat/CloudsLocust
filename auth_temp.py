@@ -129,7 +129,7 @@ def send_temperature():
                 "longitude": longitude1 + (random.random() - 0.5) * 1e-2,
             }
 
-            resps.append(base64.b64decode(publish_message(data).request.body.decode('utf8')))
+            resps.append(base64.b64decode(publish_message(data).request.body.encode('ascii')))
             time.sleep(delay_ms * 1e-3)
             curr_temp = generate_temperature(curr_temp)
         except Exception as e:
