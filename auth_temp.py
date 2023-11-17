@@ -110,7 +110,7 @@ def send_messages():
                 "longitude": longitude1 + (random.random() - 0.5) * 1e-2,
             }
 
-            resps.append(publish_message(data))
+            resps.append(publish_message(data).request.body)
             time.sleep(20 * 1e-3)
             curr_temp = generate_temperature(curr_temp)
         except Exception as e:
