@@ -97,10 +97,11 @@ def check():
 
 @app.get("/send/temp")
 def send_messages():
+    num = int(flask.request.args.get('num'))
     global curr_temp
     resp_to_return = {}
     resps = []
-    for _ in range(2):
+    for _ in range(num):
         try:
             data = {
                 "type": "TEMP",
