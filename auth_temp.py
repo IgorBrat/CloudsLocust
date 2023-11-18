@@ -87,14 +87,18 @@ def prepare_message(data):
 
 
 def publish_message(data):
-    data = json.dumps(data)
-    message_bytes = data.encode('ascii')
-    base64_bytes = base64.b64encode(message_bytes)
-    message_encoded = base64_bytes.decode('ascii')
-    resp = session.post(target_url, json=(prepare_message(message_encoded)))
-    print(resp)
-    print(resp.content)
-    print(resp.request.body)
+    resp = 0
+    try:
+        data = json.dumps(data)
+        message_bytes = data.encode('ascii')
+        base64_bytes = base64.b64encode(message_bytes)
+        message_encoded = base64_bytes.decode('ascii')
+        resp = session.post(target_url, json=(prepare_message(message_encoded)))
+        print(resp)
+        print(resp.content)
+        print(resp.request.body)
+    except Exception:
+        print('shit')
     return resp
 
 
@@ -130,14 +134,14 @@ def send_temperature():
                 "latitude": latitude1 + (random.random() - 0.5) * 1e-2,
                 "longitude": longitude1 + (random.random() - 0.5) * 1e-2,
             }
-
-            resps.append(base64.b64decode(publish_message(data).request.body.encode('ascii')).decode('ascii'))
+            resps.append(publish_message(data).content.decode('utf-8'))
             time.sleep(delay_ms * 1e-3)
             curr_temp = generate_temperature(curr_temp)
         except Exception as e:
             print(f'Exception: {e}')
             return flask.Response(status=HTTPStatus.BAD_REQUEST)
     resp_to_return['request_body'] = resps
+    print('horay')
     return flask.Response(json.dumps(resp_to_return), status=HTTPStatus.OK)
 
 
@@ -157,8 +161,7 @@ def send_humidity():
                 "latitude": latitude2 + (random.random() - 0.5) * 1e-2,
                 "longitude": longitude2 + (random.random() - 0.5) * 1e-2,
             }
-
-            resps.append(publish_message(data).request.body.decode('utf8'))
+            resps.append(publish_message(data).content.decode('utf-8'))
             time.sleep(delay_ms * 1e-3)
             curr_humidity = generate_humidity(curr_humidity)
         except Exception as e:
@@ -184,8 +187,7 @@ def send_heartbeat():
                 "latitude": latitude3 + (random.random() - 0.5) * 1e-2,
                 "longitude": longitude3 + (random.random() - 0.5) * 1e-2,
             }
-
-            resps.append(publish_message(data).request.body.decode('utf8'))
+            resps.append(publish_message(data).content.decode('utf-8'))
             time.sleep(delay_ms * 1e-3)
             curr_heartbeat = generate_heartbeat(curr_heartbeat)
         except Exception as e:
@@ -196,8 +198,8 @@ def send_heartbeat():
 
 @app.get("/getData")
 def get_db_data():
-    _ = session.get(function_endpoint)
-    return flask.Response('great', status=HTTPStatus.OK)
+    resp = session.get(function_endpoint)
+    return flask.Response(resp.content, status=HTTPStatus.OK)
 
 
 creds, _ = google.auth.load_credentials_from_file(r'./resources/creds.json',
