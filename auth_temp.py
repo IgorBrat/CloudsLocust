@@ -43,7 +43,9 @@ def generate_heartbeat(last_heartbeat, min_threshold=60, max_threshold=180):
 
 
 # Auth
-credentials_path = r"./resources/creds.json"
+
+credentials_path = r"./resources/creds1.json"
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credentials_path
 
 parser = argparse.ArgumentParser(description='Humidity measure device')
 parser.add_argument('--project_id', type=str, help='Receiver gcp project id')
