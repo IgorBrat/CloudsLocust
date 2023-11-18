@@ -202,7 +202,7 @@ def send_heartbeat():
 
 @app.get("/getData")
 def get_db_data():
-    auth_req = google.auth.transport.requests.Request(session)
+    auth_req = google.auth.transport.requests.Request()
     token = fetch_id_token(auth_req, target_url)
     print(token)
     # resp = session.request('GET', function_endpoint,
@@ -213,5 +213,5 @@ def get_db_data():
 
 creds, _ = google.auth.load_credentials_from_file(credentials_path,
                                                   scopes=['https://www.googleapis.com/auth/pubsub'])
-session = AuthorizedSession(creds)
+# session = AuthorizedSession(creds)
 app.run(host='0.0.0.0')
