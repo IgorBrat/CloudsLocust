@@ -203,7 +203,7 @@ def send_heartbeat():
 
 @app.get("/get_data")
 def get_all_db_data():
-    val_type = request.args.get('type')
+    val_type = flask.request.args.get('type')
     if not val_type:
         pass
     elif val_type in ['TEMP', 'HUMIDITY', 'HB']:
