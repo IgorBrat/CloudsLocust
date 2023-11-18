@@ -203,6 +203,14 @@ def send_heartbeat():
 
 @app.get("/get_data")
 def get_all_db_data():
+    val_type = request.args.get('type')
+    if not val_type:
+        pass
+    elif val_type in ['TEMP', 'HUMIDITY', 'HB']:
+        function_endpoint += f'&type={val_type}'
+    else:
+        return flask.Response('No such device type in DB')
+
     token = id_token.fetch_id_token(auth_req, function_endpoint)
     resp = requests.request('GET', function_endpoint, headers={"Authorization": f"Bearer {token}"})
     data = json.loads(resp.content.decode('utf-8'))['response']
