@@ -205,7 +205,7 @@ def send_heartbeat():
 def get_all_db_data():
     token = id_token.fetch_id_token(auth_req, function_endpoint)
     resp = requests.request('GET', function_endpoint, headers={"Authorization": f"Bearer {token}"})
-    data = resp.content.decode('utf-8')['response']
+    data = json.loads(resp.content.decode('utf-8')['response'])
     return flask.Response(data[0:5], status=HTTPStatus.OK)
 
 
