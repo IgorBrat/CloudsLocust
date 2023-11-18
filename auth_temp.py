@@ -10,6 +10,7 @@ import argparse
 import time
 import google.auth
 from google.auth.transport.requests import AuthorizedSession
+from google.oauth2.id_token import fetch_id_token
 
 
 def generate_temperature(last_temp, min_threshold=0, max_threshold=60):
@@ -198,12 +199,16 @@ def send_heartbeat():
 
 @app.get("/getData")
 def get_db_data():
+    auth_req = google.auth.transport.requests.Request()
+    token = fetch_id_token(auth_req, target_url)
+    print(token)
     resp = session.request('GET', function_endpoint)
     return flask.Response(resp.content, status=HTTPStatus.OK)
 
 
 creds, _ = google.auth.load_credentials_from_file(r'./resources/creds.json',
-                                                  scopes=['https://www.googleapis.com/auth/pubsub'])
+                                                  scopes=['https://www.googleapis.com/auth/pubsub',
+                                                          ])
 print(creds)
 session = AuthorizedSession(creds)
 app.run(host='0.0.0.0')
