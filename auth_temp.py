@@ -3,6 +3,8 @@ import datetime
 import os
 import random
 from http import HTTPStatus
+
+import requests
 from geopy import Nominatim
 import flask
 import json
@@ -202,8 +204,9 @@ def get_db_data():
     auth_req = google.auth.transport.requests.Request()
     token = fetch_id_token(auth_req, target_url)
     print(token)
-    resp = session.request('GET', function_endpoint,
-                           headers={"Authorization": f"Bearer {token}"})
+    # resp = session.request('GET', function_endpoint,
+    #                        headers={"Authorization": f"Bearer {token}"})
+    resp = requests.request('GET', function_endpoint, headers={"Authorization": f"Bearer {token}"})
     return flask.Response(resp.content, status=HTTPStatus.OK)
 
 
