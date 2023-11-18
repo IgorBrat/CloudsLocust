@@ -206,7 +206,7 @@ def get_all_db_data():
     token = id_token.fetch_id_token(auth_req, function_endpoint)
     resp = requests.request('GET', function_endpoint, headers={"Authorization": f"Bearer {token}"})
     data = json.loads(resp.content.decode('utf-8'))['response']
-    return flask.Response(data[0:5], status=HTTPStatus.OK)
+    return flask.render_template('visualise_data.html', data=data)
 
 
 creds, _ = google.auth.load_credentials_from_file(credentials_path,

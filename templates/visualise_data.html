@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>IoT-devices Data</title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/predictions.css') }}">
+    </head>
+    <body>
+        <h1>Predictions</h1>
+        <div class="data">
+            <table>
+                <tr>
+                    <th>Type</th>
+                    <th>Value</th>
+                    <th>Datetime</th>
+                    <th>Latitude</th>
+                    <th>Longitude</th>
+                </tr>
+                {% for row in data %}
+                <tr>
+                    {% for value in row %}
+                    <td>{{ value }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% endfor %}
+    </body>
+</html>
