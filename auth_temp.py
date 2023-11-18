@@ -44,8 +44,7 @@ def generate_heartbeat(last_heartbeat, min_threshold=60, max_threshold=180):
 
 # Auth
 
-credentials_path = r"./resources/creds1.json"
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credentials_path
+credentials_path = r"./resources/creds.json"
 
 parser = argparse.ArgumentParser(description='Humidity measure device')
 parser.add_argument('--project_id', type=str, help='Receiver gcp project id')
@@ -203,7 +202,7 @@ def send_heartbeat():
 
 @app.get("/getData")
 def get_db_data():
-    auth_req = google.auth.transport.requests.Request()
+    auth_req = google.auth.transport.requests.Request(session)
     token = fetch_id_token(auth_req, target_url)
     print(token)
     # resp = session.request('GET', function_endpoint,
