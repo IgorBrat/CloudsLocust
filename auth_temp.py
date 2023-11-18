@@ -211,7 +211,8 @@ def get_all_db_data():
         endpoint += f'&type={val_type}'
     else:
         return flask.Response('No such device type in DB')
-
+    print(endpoint)
+    print(val_type)
     token = id_token.fetch_id_token(auth_req, function_endpoint)
     resp = requests.request('GET', endpoint, headers={"Authorization": f"Bearer {token}"})
     data = json.loads(resp.content.decode('utf-8'))['response']
