@@ -207,8 +207,8 @@ def get_db_data():
     print(token)
     # resp = session.request('GET', function_endpoint,
     #                        headers={"Authorization": f"Bearer {token}"})
-    resp = requests.request('GET', function_endpoint, headers={"Authorization": f"Bearer {token}"})
-    return flask.Response(resp.content, status=HTTPStatus.OK)
+    # resp = requests.request('GET', function_endpoint, headers={"Authorization": f"Bearer {token}"})
+    return flask.Response(token, status=HTTPStatus.OK)
 
 
 creds, _ = google.auth.load_credentials_from_file(r'./resources/creds.json',
