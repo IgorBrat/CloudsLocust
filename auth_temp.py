@@ -200,17 +200,18 @@ def send_heartbeat():
     resp_to_return['request_body'] = resps
     return flask.Response(json.dumps(resp_to_return), status=HTTPStatus.OK)
 
+
 @app.get("/getData")
 def get_db_data():
-    auth_req = google.auth.transport.requests.Request()
     token = id_token.fetch_id_token(auth_req, function_endpoint)
-    # resp = session.request('GET', function_endpoint,
-    #                        headers={"Authorization": f"Bearer {token}"})
-    resp = requests.request('GET', function_endpoint, headers={"Authorization": f"Bearer {token}"})
+    resp = session.request('GET', function_endpoint,
+                           headers={"Authorization": f"Bearer {token}"})
+    # resp = requests.request('GET', function_endpoint, headers={"Authorization": f"Bearer {token}"})
     return flask.Response(resp.content, status=HTTPStatus.OK)
 
 
 creds, _ = google.auth.load_credentials_from_file(credentials_path,
                                                   scopes=['https://www.googleapis.com/auth/pubsub'])
-# session = AuthorizedSession(creds)
+session = AuthorizedSession(creds)
+auth_req = google.auth.transport.requests.Request()
 app.run(host='0.0.0.0')
