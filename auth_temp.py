@@ -12,7 +12,7 @@ import argparse
 import time
 import google.auth
 from google.auth.transport.requests import AuthorizedSession
-from google.oauth2.id_token import fetch_id_token
+from google.oauth2 import id_token
 
 
 def generate_temperature(last_temp, min_threshold=0, max_threshold=60):
@@ -44,7 +44,7 @@ def generate_heartbeat(last_heartbeat, min_threshold=60, max_threshold=180):
 
 # Auth
 
-credentials_path = r"./resources/creds1.json"
+credentials_path = r"./resources/creds.json"
 
 parser = argparse.ArgumentParser(description='Humidity measure device')
 parser.add_argument('--project_id', type=str, help='Receiver gcp project id')
@@ -203,8 +203,7 @@ def send_heartbeat():
 @app.get("/getData")
 def get_db_data():
     auth_req = google.auth.transport.requests.Request()
-    token = fetch_id_token(auth_req, target_url)
-    print(token)
+    token = id_token.fetch_id_token(auth_req, function_endpoint)
     # resp = session.request('GET', function_endpoint,
     #                        headers={"Authorization": f"Bearer {token}"})
     resp = requests.request('GET', function_endpoint, headers={"Authorization": f"Bearer {token}"})
