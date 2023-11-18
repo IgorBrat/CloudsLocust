@@ -201,12 +201,13 @@ def send_heartbeat():
     return flask.Response(json.dumps(resp_to_return), status=HTTPStatus.OK)
 
 
-@app.get("/getData")
-def get_db_data():
+@app.get("/get_data")
+def get_all_db_data():
     token = id_token.fetch_id_token(auth_req, function_endpoint)
     resp = session.request('GET', function_endpoint,
                            headers={"Authorization": f"Bearer {token}"})
     # resp = requests.request('GET', function_endpoint, headers={"Authorization": f"Bearer {token}"})
+    print(type(resp.content))
     return flask.Response(resp.content, status=HTTPStatus.OK)
 
 
