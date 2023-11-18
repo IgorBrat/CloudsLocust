@@ -208,10 +208,10 @@ def get_db_data():
     # resp = session.request('GET', function_endpoint,
     #                        headers={"Authorization": f"Bearer {token}"})
     resp = requests.request('GET', function_endpoint, headers={"Authorization": f"Bearer {token}"})
-    return flask.Response(token, status=HTTPStatus.OK)
+    return flask.Response(resp.content, status=HTTPStatus.OK)
 
 
 creds, _ = google.auth.load_credentials_from_file(credentials_path,
                                                   scopes=['https://www.googleapis.com/auth/pubsub'])
-# session = AuthorizedSession(creds)
+session = AuthorizedSession(creds)
 app.run(host='0.0.0.0')
