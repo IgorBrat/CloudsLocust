@@ -198,7 +198,7 @@ def send_heartbeat():
 
 @app.get("/getData")
 def get_db_data():
-    resp = session.get(function_endpoint)
+    resp = session.request('GET', function_endpoint)
     return flask.Response(resp.content, status=HTTPStatus.OK)
 
 
