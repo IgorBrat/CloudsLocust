@@ -44,7 +44,7 @@ def generate_heartbeat(last_heartbeat, min_threshold=60, max_threshold=180):
 
 # Auth
 
-credentials_path = r"./resources/creds.json"
+credentials_path = r"./resources/creds1.json"
 
 parser = argparse.ArgumentParser(description='Humidity measure device')
 parser.add_argument('--project_id', type=str, help='Receiver gcp project id')
@@ -207,13 +207,11 @@ def get_db_data():
     print(token)
     # resp = session.request('GET', function_endpoint,
     #                        headers={"Authorization": f"Bearer {token}"})
-    # resp = requests.request('GET', function_endpoint, headers={"Authorization": f"Bearer {token}"})
+    resp = requests.request('GET', function_endpoint, headers={"Authorization": f"Bearer {token}"})
     return flask.Response(token, status=HTTPStatus.OK)
 
 
-creds, _ = google.auth.load_credentials_from_file(r'./resources/creds.json',
-                                                  scopes=['https://www.googleapis.com/auth/pubsub',
-                                                          ])
-print(creds)
-session = AuthorizedSession(creds)
+creds, _ = google.auth.load_credentials_from_file(credentials_path,
+                                                  scopes=['https://www.googleapis.com/auth/pubsub'])
+# session = AuthorizedSession(creds)
 app.run(host='0.0.0.0')
