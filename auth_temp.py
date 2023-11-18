@@ -133,10 +133,10 @@ def send_temperature():
         try:
             data = {
                 "type": "TEMP",
-                "value": curr_temp,
+                "value": round(curr_temp, 3),
                 "datetime": str(datetime.datetime.now()),
-                "latitude": latitude1 + (random.random() - 0.5) * 1e-2,
-                "longitude": longitude1 + (random.random() - 0.5) * 1e-2,
+                "latitude": round(latitude1 + (random.random() - 0.5) * 1e-2, 5),
+                "longitude": round(longitude1 + (random.random() - 0.5) * 1e-2, 5),
             }
             resps.append(publish_message(data).content.decode('utf-8'))
             time.sleep(delay_ms * 1e-3)
@@ -160,10 +160,10 @@ def send_humidity():
         try:
             data = {
                 "type": "HUM",
-                "value": curr_humidity,
+                "value": round(curr_humidity, 3),
                 "datetime": str(datetime.datetime.now()),
-                "latitude": latitude2 + (random.random() - 0.5) * 1e-2,
-                "longitude": longitude2 + (random.random() - 0.5) * 1e-2,
+                "latitude": round(latitude2 + (random.random() - 0.5) * 1e-2, 5),
+                "longitude": round(longitude2 + (random.random() - 0.5) * 1e-2, 5),
             }
             resps.append(publish_message(data).content.decode('utf-8'))
             time.sleep(delay_ms * 1e-3)
@@ -188,8 +188,8 @@ def send_heartbeat():
                 "type": "HB",
                 "value": curr_heartbeat,
                 "datetime": str(datetime.datetime.now()),
-                "latitude": latitude3 + (random.random() - 0.5) * 1e-2,
-                "longitude": longitude3 + (random.random() - 0.5) * 1e-2,
+                "latitude": round(latitude3 + (random.random() - 0.5) * 1e-2, 5),
+                "longitude": round(longitude3 + (random.random() - 0.5) * 1e-2, 5),
             }
             resps.append(publish_message(data).content.decode('utf-8'))
             time.sleep(delay_ms * 1e-3)
