@@ -184,6 +184,8 @@ def send_heartbeat():
 def send_junk():
     num = int(flask.request.args.get('num'))
     delay_ms = int(flask.request.args.get('delay'))
+    resp_to_return = {}
+    resps = []
     for _ in range(num):
         try:
             data = {
@@ -192,12 +194,13 @@ def send_junk():
                 "datetime": str(datetime.datetime.now()),
                 "latitude": random.randint(-50, 50),
             }
-            publish_message(data).content.decode('utf-8')
+            resps.append(publish_message(data).content.decode('utf-8'))
             time.sleep(delay_ms * 1e-3)
         except Exception as e:
             print(f'Exception: {e}')
             return flask.Response(str(e), status=HTTPStatus.BAD_REQUEST)
-    return flask.Response("Messages sent successfully", status=HTTPStatus.OK)
+    resp_to_return['request_body'] = resps
+    return flask.Response(json.dumps(resp_to_return), status=HTTPStatus.OK)
 
 
 @app.get("/get_data")
