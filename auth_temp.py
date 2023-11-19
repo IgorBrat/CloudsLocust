@@ -80,28 +80,55 @@ curr_heartbeat = 110
 app = flask.Flask(__name__)
 
 
-def prepare_message(data):
+def prepare_message(data, value_type):
     return {
         "messages": [
             {
                 "data": data,
+                "attributes": {
+                    "value_type": value_type,
+                }
             }
         ]
     }
 
 
-def publish_message(data):
+def publish_message(data, value_type=None):
     resp = 0
     try:
         data = json.dumps(data)
         message_bytes = data.encode('ascii')
         base64_bytes = base64.b64encode(message_bytes)
         message_encoded = base64_bytes.decode('ascii')
-        resp = session.post(target_url, json=(prepare_message(message_encoded)))
+        resp = session.post(target_url, json=(prepare_message(message_encoded, value_type)))
     except Exception as e:
         print(f'Exception when publishing: {e}')
     return resp
 
+@app.post("/temperature1")
+def send_temperature():
+    num = int(flask.request.args.get('num'))
+    delay_ms = int(flask.request.args.get('delay'))
+    global curr_temp
+    resp_to_return = {}
+    resps = []
+    for _ in range(num):
+        try:
+            data = {
+                "type": "TEMP",
+                "value": round(curr_temp, 3),
+                "datetime": str(datetime.datetime.now()),
+                "latitude": round(latitude1 + (random.random() - 0.5) * 1e-2, 5),
+                "longitude": round(longitude1 + (random.random() - 0.5) * 1e-2, 5),
+            }
+            resps.append(publish_message(data, "TEMP").content.decode('utf-8'))
+            time.sleep(delay_ms * 1e-3)
+            curr_temp = generate_temperature(curr_temp)
+        except Exception as e:
+            print(f'Exception: {e}')
+            return flask.Response(status=HTTPStatus.BAD_REQUEST)
+    resp_to_return['request_body'] = resps
+    return flask.Response(json.dumps(resp_to_return), status=HTTPStatus.OK)
 
 @app.post("/temperature")
 def send_temperature():
@@ -179,6 +206,7 @@ def send_heartbeat():
             return flask.Response(status=HTTPStatus.BAD_REQUEST)
     resp_to_return['request_body'] = resps
     return flask.Response(json.dumps(resp_to_return), status=HTTPStatus.OK)
+
 
 @app.post("/junk")
 def send_junk():
