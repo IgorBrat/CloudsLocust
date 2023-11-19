@@ -103,7 +103,7 @@ def publish_message(data):
     return resp
 
 
-@app.get("/send/temperature")
+@app.post("/temperature")
 def send_temperature():
     num = int(flask.request.args.get('num'))
     delay_ms = int(flask.request.args.get('delay'))
@@ -129,7 +129,7 @@ def send_temperature():
     return flask.Response(json.dumps(resp_to_return), status=HTTPStatus.OK)
 
 
-@app.get("/send/humidity")
+@app.post("/humidity")
 def send_humidity():
     num = int(flask.request.args.get('num'))
     delay_ms = int(flask.request.args.get('delay'))
@@ -180,7 +180,7 @@ def send_heartbeat():
     resp_to_return['request_body'] = resps
     return flask.Response(json.dumps(resp_to_return), status=HTTPStatus.OK)
 
-@app.get("/send_junk")
+@app.post("/junk")
 def send_junk():
     num = int(flask.request.args.get('num'))
     delay_ms = int(flask.request.args.get('delay'))
