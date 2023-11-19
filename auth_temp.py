@@ -86,7 +86,7 @@ def prepare_message(data, value_type):
             {
                 "data": data,
                 "attributes": {
-                    "value_type": value_type,
+                    "type": value_type,
                 }
             }
         ]
