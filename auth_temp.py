@@ -105,8 +105,8 @@ def publish_message(data, value_type=None):
         print(f'Exception when publishing: {e}')
     return resp
 
-@app.post("/temperature1")
-def send_temperature1():
+@app.post("/temperature")
+def send_temperature():
     num = int(flask.request.args.get('num'))
     delay_ms = int(flask.request.args.get('delay'))
     global curr_temp
@@ -130,32 +130,6 @@ def send_temperature1():
     resp_to_return['request_body'] = resps
     return flask.Response(json.dumps(resp_to_return), status=HTTPStatus.OK)
 
-@app.post("/temperature")
-def send_temperature():
-    num = int(flask.request.args.get('num'))
-    delay_ms = int(flask.request.args.get('delay'))
-    global curr_temp
-    resp_to_return = {}
-    resps = []
-    for _ in range(num):
-        try:
-            data = {
-                "type": "TEMP",
-                "value": round(curr_temp, 3),
-                "datetime": str(datetime.datetime.now()),
-                "latitude": round(latitude1 + (random.random() - 0.5) * 1e-2, 5),
-                "longitude": round(longitude1 + (random.random() - 0.5) * 1e-2, 5),
-            }
-            resps.append(publish_message(data).content.decode('utf-8'))
-            time.sleep(delay_ms * 1e-3)
-            curr_temp = generate_temperature(curr_temp)
-        except Exception as e:
-            print(f'Exception: {e}')
-            return flask.Response(status=HTTPStatus.BAD_REQUEST)
-    resp_to_return['request_body'] = resps
-    return flask.Response(json.dumps(resp_to_return), status=HTTPStatus.OK)
-
-
 @app.post("/humidity")
 def send_humidity():
     num = int(flask.request.args.get('num'))
@@ -172,7 +146,7 @@ def send_humidity():
                 "latitude": round(latitude2 + (random.random() - 0.5) * 1e-2, 5),
                 "longitude": round(longitude2 + (random.random() - 0.5) * 1e-2, 5),
             }
-            resps.append(publish_message(data).content.decode('utf-8'))
+            resps.append(publish_message(data, "HUM").content.decode('utf-8'))
             time.sleep(delay_ms * 1e-3)
             curr_humidity = generate_humidity(curr_humidity)
         except Exception as e:
@@ -198,7 +172,7 @@ def send_heartbeat():
                 "latitude": round(latitude3 + (random.random() - 0.5) * 1e-2, 5),
                 "longitude": round(longitude3 + (random.random() - 0.5) * 1e-2, 5),
             }
-            resps.append(publish_message(data).content.decode('utf-8'))
+            resps.append(publish_message(data, "HB").content.decode('utf-8'))
             time.sleep(delay_ms * 1e-3)
             curr_heartbeat = generate_heartbeat(curr_heartbeat)
         except Exception as e:
@@ -237,7 +211,7 @@ def get_all_db_data():
     endpoint = function_endpoint
     if not val_type:
         pass
-    elif val_type in ['TEMP', 'HUMIDITY', 'HB']:
+    elif val_type in ['TEMP', 'HUM', 'HB']:
         endpoint += f'?type={val_type}'
     else:
         return flask.Response('No such device type in DB', HTTPStatus.NOT_FOUND)
