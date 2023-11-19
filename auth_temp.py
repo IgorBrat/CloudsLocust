@@ -155,7 +155,7 @@ def send_humidity():
     return flask.Response(json.dumps(resp_to_return), status=HTTPStatus.OK)
 
 
-@app.get("/send/heartbeat")
+@app.post("/heartbeat")
 def send_heartbeat():
     num = int(flask.request.args.get('num'))
     delay_ms = int(flask.request.args.get('delay'))
