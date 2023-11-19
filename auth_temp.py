@@ -106,7 +106,7 @@ def publish_message(data, value_type=None):
     return resp
 
 @app.post("/temperature1")
-def send_temperature():
+def send_temperature1():
     num = int(flask.request.args.get('num'))
     delay_ms = int(flask.request.args.get('delay'))
     global curr_temp
