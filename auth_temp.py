@@ -57,7 +57,7 @@ if not args.topic_id:
     raise ValueError('Specify topic id')
 
 target_url = f"https://pubsub.googleapis.com/v1/projects/{args.project_id}/topics/{args.topic_id}:publish"
-function_endpoint = f"https://{os.getenv('ZONE')}-{args.project_id}.cloudfunctions.net/{os.getenv('FUNC_NAME')}"
+function_endpoint = f"https://{os.getenv('REGION')}-{args.project_id}.cloudfunctions.net/{os.getenv('FUNC_NAME')}"
 
 # Location
 loc = Nominatim(user_agent="GetLoc")
@@ -98,28 +98,9 @@ def publish_message(data):
         base64_bytes = base64.b64encode(message_bytes)
         message_encoded = base64_bytes.decode('ascii')
         resp = session.post(target_url, json=(prepare_message(message_encoded)))
-        print(resp)
-        print(resp.content)
-        print(resp.request.body)
-    except Exception:
-        print('shit')
+    except Exception as e:
+        print(f'Exception when publishing: {e}')
     return resp
-
-
-@app.get("/check")
-def check():
-    check_body = {
-        'address': target_url,
-        'data': {
-            "type": "TEMP",
-            "value": curr_temp,
-            "datetime": str(datetime.datetime.now()),
-            "latitude": latitude1 + (random.random() - 0.5) * 1e-2,
-            "longitude": longitude1 + (random.random() - 0.5) * 1e-2,
-        }
-    }
-    check_body = json.dumps(check_body)
-    return flask.Response(check_body, HTTPStatus.OK)
 
 
 @app.get("/send/temperature")
@@ -145,7 +126,6 @@ def send_temperature():
             print(f'Exception: {e}')
             return flask.Response(status=HTTPStatus.BAD_REQUEST)
     resp_to_return['request_body'] = resps
-    print('horay')
     return flask.Response(json.dumps(resp_to_return), status=HTTPStatus.OK)
 
 
@@ -200,6 +180,25 @@ def send_heartbeat():
     resp_to_return['request_body'] = resps
     return flask.Response(json.dumps(resp_to_return), status=HTTPStatus.OK)
 
+@app.get("/send_junk")
+def send_junk():
+    num = int(flask.request.args.get('num'))
+    delay_ms = int(flask.request.args.get('delay'))
+    for _ in range(num):
+        try:
+            data = {
+                "type": "GAS",
+                "val": random.randint(-100, 100),
+                "datetime": str(datetime.datetime.now()),
+                "latitude": random.randint(-50, 50),
+            }
+            publish_message(data).content.decode('utf-8')
+            time.sleep(delay_ms * 1e-3)
+        except Exception as e:
+            print(f'Exception: {e}')
+            return flask.Response(str(e), status=HTTPStatus.BAD_REQUEST)
+    return flask.Response("Messages sent successfully", status=HTTPStatus.OK)
+
 
 @app.get("/get_data")
 def get_all_db_data():
@@ -208,11 +207,9 @@ def get_all_db_data():
     if not val_type:
         pass
     elif val_type in ['TEMP', 'HUMIDITY', 'HB']:
-        endpoint += f'&type={val_type}'
+        endpoint += f'?type={val_type}'
     else:
-        return flask.Response('No such device type in DB')
-    print(endpoint)
-    print(val_type)
+        return flask.Response('No such device type in DB', HTTPStatus.NOT_FOUND)
     token = id_token.fetch_id_token(auth_req, function_endpoint)
     resp = requests.request('GET', endpoint, headers={"Authorization": f"Bearer {token}"})
     data = json.loads(resp.content.decode('utf-8'))['response']
