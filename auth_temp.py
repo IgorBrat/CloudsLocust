@@ -181,7 +181,6 @@ def send_heartbeat():
     resp_to_return['request_body'] = resps
     return flask.Response(json.dumps(resp_to_return), status=HTTPStatus.OK)
 
-#check unformatted messages
 @app.post("/junk")
 def send_junk():
     num = int(flask.request.args.get('num'))
